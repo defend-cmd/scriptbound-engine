@@ -1,0 +1,11 @@
+{
+  "nodes": {
+    "n1": { "type": "entry", "x": 0, "y": 0, "props": {} },
+    "n2": { "type": "condition", "x": 200, "y": 0, "props": { "target": "state", "key": "mm_innocents_alive", "scope": "global", "op": "<=", "value": "0" } },
+    "n3": { "type": "trigger", "x": 400, "y": -50, "props": { "target": "mm_end_game" } }
+  },
+  "wires": [
+    { "from": "n1", "to": "n2" },
+    { "from": "n2", "to": "n3", "pin": "true" }
+  ]
+}

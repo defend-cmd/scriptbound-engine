@@ -1,0 +1,11 @@
+{
+  "displayName": "Game Master",
+  "health": 20.0,
+  "invulnerable": true,
+  "onInteract": "mm_start_murderer",
+  "onDeath": "",
+  "form": {
+    "id": "bbs:mob",
+    "mobId": "minecraft:villager"
+  }
+}

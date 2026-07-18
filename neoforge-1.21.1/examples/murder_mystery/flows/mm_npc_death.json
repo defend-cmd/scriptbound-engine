@@ -1,0 +1,13 @@
+{
+  "nodes": {
+    "n1": { "type": "entry", "x": 0, "y": 0, "props": {} },
+    "n2": { "type": "state", "x": 200, "y": 0, "props": { "key": "mm_innocents_alive", "scope": "global", "op": "sub", "value": "1" } },
+    "n3": { "type": "command", "x": 400, "y": 0, "props": { "command": "title @a actionbar {\"text\":\"A body has been discovered!\",\"color\":\"gold\"}" } },
+    "n4": { "type": "trigger", "x": 600, "y": 0, "props": { "target": "mm_check_win" } }
+  },
+  "wires": [
+    { "from": "n1", "to": "n2" },
+    { "from": "n2", "to": "n3" },
+    { "from": "n3", "to": "n4" }
+  ]
+}

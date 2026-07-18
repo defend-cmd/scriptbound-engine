@@ -1,0 +1,11 @@
+{
+  "block.scriptbound.trigger_block": "Trigger Block",
+  "block.scriptbound.region_block": "Region Block",
+  "item.scriptbound.trigger_block": "Trigger Block",
+  "item.scriptbound.region_block": "Region Block",
+  "itemGroup.scriptbound": "ScriptBound Engine",
+  "key.categories.scriptbound": "ScriptBound Engine",
+  "key.scriptbound.dashboard": "Open Dashboard",
+  "key.scriptbound.journal": "Open Quest Journal",
+  "entity.scriptbound.npc": "ScriptBound NPC"
+}

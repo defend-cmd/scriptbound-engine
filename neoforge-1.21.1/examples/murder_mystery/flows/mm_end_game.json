@@ -1,0 +1,15 @@
+{
+  "nodes": {
+    "n1": { "type": "entry", "x": 0, "y": 0, "props": {} },
+    "n2": { "type": "command", "x": 200, "y": 0, "props": { "command": "title @a title {\"text\":\"MURDERER WINS!\",\"color\":\"red\"}" } },
+    "n3": { "type": "command", "x": 400, "y": 0, "props": { "command": "clear @a" } },
+    "n4": { "type": "state", "x": 600, "y": 0, "props": { "key": "mm_active", "scope": "global", "op": "set", "value": "0" } },
+    "n5": { "type": "command", "x": 800, "y": 0, "props": { "command": "tp @a 100 64 100" } }
+  },
+  "wires": [
+    { "from": "n1", "to": "n2" },
+    { "from": "n2", "to": "n3" },
+    { "from": "n3", "to": "n4" },
+    { "from": "n4", "to": "n5" }
+  ]
+}

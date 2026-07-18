@@ -1,0 +1,32 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="scriptbound"
+version="${mod_version}"
+displayName="ScriptBound Engine"
+logoFile="icon.jpg"
+authors="defend"
+description='''
+Map scripting engine for Minecraft 1.21.1 NeoForge.
+'''
+
+[[dependencies.scriptbound]]
+modId="neoforge"
+mandatory=true
+versionRange="[21,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.scriptbound]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.21.1,1.22)"
+ordering="NONE"
+[[dependencies.scriptbound]]
+modId="blockbuster"
+mandatory=false
+versionRange="*"
+ordering="AFTER"
+side="BOTH"

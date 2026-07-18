@@ -1,0 +1,11 @@
+{
+  "displayName": "Bob",
+  "health": 20.0,
+  "invulnerable": false,
+  "onInteract": "",
+  "onDeath": "mm_npc_death",
+  "form": {
+    "id": "bbs:mob",
+    "mobId": "minecraft:villager"
+  }
+}

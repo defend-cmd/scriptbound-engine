@@ -1,0 +1,19 @@
+{
+  "nodes": {
+    "n1": { "type": "entry", "x": 0, "y": 0, "props": {} },
+    "n2": { "type": "state", "x": 200, "y": 0, "props": { "key": "mm_active", "scope": "global", "op": "set", "value": "1" } },
+    "n3": { "type": "state", "x": 400, "y": 0, "props": { "key": "mm_innocents_alive", "scope": "global", "op": "set", "value": "3" } },
+    "n4": { "type": "state", "x": 600, "y": 0, "props": { "key": "mm_phase", "scope": "global", "op": "set", "value": "1" } },
+    "n5": { "type": "command", "x": 800, "y": 0, "props": { "command": "title @p title {\"text\":\"You are the Murderer!\",\"color\":\"red\"}" } },
+    "n6": { "type": "command", "x": 1000, "y": 0, "props": { "command": "give @p iron_sword 1" } },
+    "n7": { "type": "command", "x": 1200, "y": 0, "props": { "command": "tp @p 0 64 0" } }
+  },
+  "wires": [
+    { "from": "n1", "to": "n2" },
+    { "from": "n2", "to": "n3" },
+    { "from": "n3", "to": "n4" },
+    { "from": "n4", "to": "n5" },
+    { "from": "n5", "to": "n6" },
+    { "from": "n6", "to": "n7" }
+  ]
+}
