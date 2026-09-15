@@ -1,5 +1,9 @@
 # ScriptBound Engine — Changelog
 
+## 1.5.3
+
+- Fixed BBS morph rendering for NPCs on all supported loaders.
+
 ## 1.5.2
 
 - Blockbuster Studio is no longer required to run ScriptBound. Form and morph integration remains available when BBS is installed.

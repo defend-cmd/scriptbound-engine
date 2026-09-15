@@ -108,6 +108,7 @@ public class NpcEntityRenderer extends EntityRenderer<NpcEntity>
                 try
                 {
                     c.mcEntity = BbsFormBridge.createMcEntity(entity);
+                    BbsFormBridge.bindEntityForm(c.mcEntity, form);
                 }
                 catch (ReflectiveOperationException e)
                 {

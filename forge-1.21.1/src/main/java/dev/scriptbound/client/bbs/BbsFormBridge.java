@@ -95,6 +95,12 @@ public final class BbsFormBridge
         update.invoke(form, mcEntity);
     }
 
+    public static void bindEntityForm(Object mcEntity, Object form) throws ReflectiveOperationException
+    {
+        Class<?> formClass = Class.forName("mchorse.bbs_mod.forms.forms.Form");
+        mcEntity.getClass().getMethod("setForm", formClass).invoke(mcEntity, form);
+    }
+
     public static boolean available()
     {
         return BBSCompat.isLoaded();
