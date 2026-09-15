@@ -1,5 +1,9 @@
 # ScriptBound Engine — Changelog
 
+## 1.5.2
+
+- Blockbuster Studio is no longer required to run ScriptBound. Form and morph integration remains available when BBS is installed.
+
 ## 1.2.1 — Диалоги на нодах + GUI scale
 
 ### Диалоги — нодовый редактор (как Flows)
