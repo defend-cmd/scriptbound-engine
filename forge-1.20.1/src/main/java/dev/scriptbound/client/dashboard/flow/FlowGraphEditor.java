@@ -79,6 +79,7 @@ public final class FlowGraphEditor
 
     private final java.util.Set<String> selectedIds = new java.util.LinkedHashSet<>();
     private String wireFromId;
+    private final java.util.List<ConnectionSpark> connectionSparks = new ArrayList<>();
     private boolean draggingNodes;
     private final java.util.Map<String, Double> dragOffX = new java.util.HashMap<>();
     private final java.util.Map<String, Double> dragOffY = new java.util.HashMap<>();
@@ -247,6 +248,7 @@ public final class FlowGraphEditor
             renderGrid(graphics);
         }
         renderLinks(graphics);
+        renderConnectionSparks(graphics);
 
         if (this.wireFromId != null)
         {
@@ -366,6 +368,59 @@ public final class FlowGraphEditor
         }
     }
 
+    private void spawnConnectionSpark(int x, int y)
+    {
+        long now = System.currentTimeMillis();
+        this.connectionSparks.add(new ConnectionSpark(x, y, now));
+    }
+
+    private void renderConnectionSparks(GuiGraphics graphics)
+    {
+        long now = System.currentTimeMillis();
+        this.connectionSparks.removeIf(spark -> now - spark.startedAt > 320L);
+
+        for (ConnectionSpark spark : this.connectionSparks)
+        {
+            float progress = Math.min(1.0F, (now - spark.startedAt) / 320.0F);
+            float strength = 1.0F - progress;
+            int glowAlpha = Math.max(0, Math.round(120 * strength));
+            int coreAlpha = Math.max(0, Math.round(255 * strength));
+            int radius = 2 + Math.round(progress * 7.0F);
+
+            graphics.fill(spark.x - radius, spark.y - 1, spark.x + radius + 1, spark.y + 2, (glowAlpha << 24) | 0x66CCFF);
+            graphics.fill(spark.x - 1, spark.y - radius, spark.x + 2, spark.y + radius + 1, (glowAlpha << 24) | 0x66CCFF);
+
+            for (int i = 0; i < 10; i++)
+            {
+                double angle = i * 2.399963229728653 + spark.phase;
+                double distance = 3.0 + progress * (7.0 + (i % 4) * 2.0);
+                int px = spark.x + (int) Math.round(Math.cos(angle) * distance);
+                int py = spark.y + (int) Math.round(Math.sin(angle) * distance * 0.75);
+                int size = i % 3 == 0 ? 2 : 1;
+                int color = (coreAlpha << 24) | (i % 4 == 0 ? 0xFFF0A0 : 0x8FDBFF);
+                graphics.fill(px, py, px + size, py + size, color);
+            }
+
+            int flashRadius = Math.max(1, Math.round(4 * strength));
+            graphics.fill(spark.x - flashRadius, spark.y - flashRadius, spark.x + flashRadius + 1, spark.y + flashRadius + 1, (coreAlpha << 24) | 0xDDF6FF);
+        }
+    }
+
+    private static final class ConnectionSpark
+    {
+        private final int x;
+        private final int y;
+        private final long startedAt;
+        private final double phase;
+
+        private ConnectionSpark(int x, int y, long startedAt)
+        {
+            this.x = x;
+            this.y = y;
+            this.startedAt = startedAt;
+            this.phase = ((x * 31L + y * 17L) & 1023L) / 1023.0 * Math.PI * 2.0;
+        }
+    }
     private void renderNodes(GuiGraphics graphics, Font font, int mouseX, int mouseY)
     {
         int w = Math.round(nodeW() * this.scale);
@@ -885,6 +940,7 @@ public final class FlowGraphEditor
                 if (this.wireFromId != null && hasInput(node) && portHit(mouseX, mouseY, x + w / 2, y))
                 {
                     this.graph.connect(this.wireFromId, node.id);
+                    spawnConnectionSpark(x + w / 2, y);
                     this.wireFromId = null;
                     this.dirty = true;
                     saveSnapshot();
