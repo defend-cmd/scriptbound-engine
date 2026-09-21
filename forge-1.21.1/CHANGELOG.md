@@ -1,5 +1,9 @@
 # ScriptBound Engine — Changelog
 
+## 1.5.4
+
+- Fixed optional Blockbuster dependency declaration in NeoForge 1.21.1 metadata.
+
 ## 1.5.3
 
 - Fixed BBS morph rendering for NPCs on all supported loaders.

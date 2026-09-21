@@ -14,19 +14,20 @@ Map scripting engine for Minecraft 1.21.1 NeoForge.
 
 [[dependencies.scriptbound]]
 modId="neoforge"
-mandatory=true
+type="required"
 versionRange="[21,)"
 ordering="NONE"
 side="BOTH"
 
 [[dependencies.scriptbound]]
 modId="minecraft"
-mandatory=true
+type="required"
 versionRange="[1.21.1,1.22)"
 ordering="NONE"
+
 [[dependencies.scriptbound]]
 modId="blockbuster"
-mandatory=false
+type="optional"
 versionRange="*"
 ordering="AFTER"
 side="BOTH"
