@@ -8,6 +8,7 @@ import net.minecraft.server.MinecraftServer;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 public final class DemoContent
 {
@@ -17,6 +18,20 @@ public final class DemoContent
     {
         try
         {
+            Path marker = ScriptBoundPaths.root(server).resolve(".demo_initialized");
+
+            if (Files.exists(marker))
+            {
+                return;
+            }
+
+            if (hasExistingContent(server))
+            {
+                Files.createDirectories(ScriptBoundPaths.root(server));
+                Files.writeString(marker, "initialized", StandardCharsets.UTF_8);
+                return;
+            }
+
             Files.createDirectories(ScriptBoundPaths.triggersDir(server));
             Files.createDirectories(ScriptBoundPaths.scriptsDir(server));
             Files.createDirectories(ScriptBoundPaths.npcsDir(server));
@@ -219,12 +234,37 @@ public final class DemoContent
 
                 JsonFiles.writeObject(ScriptBoundPaths.npcFile(server, "guard"), npc);
             }
+
+            Files.writeString(marker, "initialized", StandardCharsets.UTF_8);
         }
         catch (Exception ignored)
         {
         }
     }
 
+    private static boolean hasExistingContent(MinecraftServer server) throws java.io.IOException
+    {
+        return Files.exists(ScriptBoundPaths.settingsFile(server))
+            || hasFiles(ScriptBoundPaths.triggersDir(server))
+            || hasFiles(ScriptBoundPaths.scriptsDir(server))
+            || hasFiles(ScriptBoundPaths.npcsDir(server))
+            || hasFiles(ScriptBoundPaths.dialoguesDir(server))
+            || hasFiles(ScriptBoundPaths.questsDir(server))
+            || hasFiles(ScriptBoundPaths.flowsDir(server));
+    }
+
+    private static boolean hasFiles(Path directory) throws java.io.IOException
+    {
+        if (!Files.isDirectory(directory))
+        {
+            return false;
+        }
+
+        try (var files = Files.list(directory))
+        {
+            return files.anyMatch(Files::isRegularFile);
+        }
+    }
     private static void writeDialogue(MinecraftServer server, String id, String speaker, String text) throws java.io.IOException
     {
         if (Files.exists(ScriptBoundPaths.dialogueFile(server, id)))
