@@ -80,6 +80,7 @@ public final class FlowGraphEditor
     private final java.util.Set<String> selectedIds = new java.util.LinkedHashSet<>();
     private String wireFromId;
     private final java.util.List<ConnectionSpark> connectionSparks = new ArrayList<>();
+    private final java.util.List<WirePulse> wirePulses = new ArrayList<>();
     private boolean draggingNodes;
     private final java.util.Map<String, Double> dragOffX = new java.util.HashMap<>();
     private final java.util.Map<String, Double> dragOffY = new java.util.HashMap<>();
@@ -248,6 +249,7 @@ public final class FlowGraphEditor
             renderGrid(graphics);
         }
         renderLinks(graphics);
+        renderWirePulses(graphics);
         renderConnectionSparks(graphics);
 
         if (this.wireFromId != null)
@@ -368,6 +370,103 @@ public final class FlowGraphEditor
         }
     }
 
+    private void spawnWirePulse(String fromId, String toId)
+    {
+        this.wirePulses.add(new WirePulse(fromId, toId, System.currentTimeMillis()));
+    }
+
+    private void renderWirePulses(GuiGraphics graphics)
+    {
+        long now = System.currentTimeMillis();
+        for (WirePulse pulse : this.wirePulses)
+        {
+            if (!pulse.arrivalSparked && now - pulse.startedAt >= 680L)
+            {
+                int[] from = port(selectedNodeById(pulse.fromId), true);
+                if (from != null)
+                {
+                    spawnConnectionSpark(from[0], from[1]);
+                }
+                pulse.arrivalSparked = true;
+            }
+        }
+        this.wirePulses.removeIf(pulse -> now - pulse.startedAt > 760L);
+
+        for (WirePulse pulse : this.wirePulses)
+        {
+            int[] from = port(selectedNodeById(pulse.fromId), true);
+            int[] to = port(selectedNodeById(pulse.toId), false);
+
+            if (from == null || to == null)
+            {
+                continue;
+            }
+
+            float progress = Math.min(1.0F, (now - pulse.startedAt) / 720.0F);
+            float t = 1.0F - progress;
+            int[] head = wirePoint(from[0], from[1], to[0], to[1], t);
+            int[] tail = wirePoint(from[0], from[1], to[0], to[1], Math.min(1.0F, t + 0.16F));
+            drawWireSection(graphics, from[0], from[1], to[0], to[1], t, Math.min(1.0F, t + 0.16F), 0xAA66CCFF);
+            drawWireSection(graphics, from[0], from[1], to[0], to[1], t, Math.min(1.0F, t + 0.07F), 0xFFE8FAFF);
+
+            int flash = Math.max(1, Math.round(3.0F * (1.0F - progress * 0.45F)));
+            graphics.fill(head[0] - flash, head[1] - flash, head[0] + flash + 1, head[1] + flash + 1, 0xFFDDF8FF);
+
+            for (int i = 0; i < 4; i++)
+            {
+                float sparkT = Math.min(1.0F, t + i * 0.025F);
+                int[] p = wirePoint(from[0], from[1], to[0], to[1], sparkT);
+                double phase = pulse.phase + i * 2.17 + progress * 18.0;
+                int distance = 2 + ((i + (int)(progress * 10)) % 4);
+                int sx = p[0] + (int)Math.round(Math.cos(phase) * distance);
+                int sy = p[1] + (int)Math.round(Math.sin(phase) * distance);
+                int alpha = 220 - i * 35;
+                graphics.fill(sx, sy, sx + 2, sy + 2, (alpha << 24) | (i == 0 ? 0xFFF2A8 : 0x8FE5FF));
+            }
+        }
+    }
+
+    private void drawWireSection(GuiGraphics graphics, int x1, int y1, int x2, int y2, float start, float end, int color)
+    {
+        int segments = 18;
+        int[] previous = wirePoint(x1, y1, x2, y2, start);
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float t = start + (end - start) * i / segments;
+            int[] current = wirePoint(x1, y1, x2, y2, t);
+            thickLine(graphics, previous[0], previous[1], current[0], current[1], color);
+            previous = current;
+        }
+    }
+
+    private int[] wirePoint(int x1, int y1, int x2, int y2, float t)
+    {
+        int dy = Math.max(20, Math.abs(y2 - y1) / 2);
+        float cy1 = y1 + dy;
+        float cy2 = y2 - dy;
+        float u = 1.0F - t;
+        int x = Math.round(u * u * u * x1 + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t * t * t * x2);
+        int y = Math.round(u * u * u * y1 + 3 * u * u * t * cy1 + 3 * u * t * t * cy2 + t * t * t * y2);
+        return new int[] {x, y};
+    }
+
+    private static final class WirePulse
+    {
+        private final String fromId;
+        private final String toId;
+        private final long startedAt;
+        private final double phase;
+        private boolean arrivalSparked;
+
+        private WirePulse(String fromId, String toId, long startedAt)
+        {
+            this.fromId = fromId;
+            this.toId = toId;
+            this.startedAt = startedAt;
+            this.phase = ((fromId.hashCode() * 31L + toId.hashCode()) & 1023L) / 1023.0 * Math.PI * 2.0;
+        }
+    }
     private void spawnConnectionSpark(int x, int y)
     {
         long now = System.currentTimeMillis();
@@ -939,8 +1038,10 @@ public final class FlowGraphEditor
 
                 if (this.wireFromId != null && hasInput(node) && portHit(mouseX, mouseY, x + w / 2, y))
                 {
-                    this.graph.connect(this.wireFromId, node.id);
+                    String connectedFromId = this.wireFromId;
+                    this.graph.connect(connectedFromId, node.id);
                     spawnConnectionSpark(x + w / 2, y);
+                    spawnWirePulse(connectedFromId, node.id);
                     this.wireFromId = null;
                     this.dirty = true;
                     saveSnapshot();
